@@ -728,7 +728,7 @@ func (s *Sandbox) Exec(ctx context.Context, argv []string, opts ...ExecOption) (
 	if options.uid != nil {
 		uid := strconv.FormatUint(uint64(*options.uid), 10)
 		if options.gid != nil {
-			uid += "+" + strconv.FormatUint(uint64(*options.gid), 10)
+			uid += ":" + strconv.FormatUint(uint64(*options.gid), 10)
 		}
 
 		args = append(args, "--user", uid)
