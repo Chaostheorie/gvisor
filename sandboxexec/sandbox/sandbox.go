@@ -660,11 +660,11 @@ func WithExecSignalRelay() ExecOption {
 	}
 }
 
-// WithUser sets the uid and gid of the user the command is executed by.
-func WithExecUser(uid uint32, gid *uint32) ExecOption {
+// WithExecUser sets the uid and gid of the user the command is executed by.
+func WithExecUser(uid, gid uint32) ExecOption {
 	return func(o *execOptions) {
 		o.uid = &uid
-		o.gid = gid
+		o.gid = &gid
 	}
 }
 
@@ -725,13 +725,12 @@ func (s *Sandbox) Exec(ctx context.Context, argv []string, opts ...ExecOption) (
 		defer os.Remove(pidFile)
 		args = append(args, "--internal-pid-file", pidFile)
 	}
-	if options.uid != nil {
-		uid := strconv.FormatUint(uint64(*options.uid), 10)
-		if options.gid != nil {
-			uid += ":" + strconv.FormatUint(uint64(*options.gid), 10)
-		}
-
-		args = append(args, "--user", uid)
+	if options.uid != nil && options.gid != nil {
+		args = append(
+			args,
+			"--user",
+			strconv.FormatUint(uint64(*options.uid), 10)+":"+strconv.FormatUint(uint64(*options.gid), 10),
+		)
 	}
 	if options.execPath != "" {
 		args = append(args, "--exec-path", options.execPath)
